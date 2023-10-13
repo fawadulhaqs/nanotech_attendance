@@ -11,7 +11,7 @@ let activeUsers = [];
 const port = process.env.PORT || 8080
 
 const db = mysql.createConnection({
-    host: 'nanotech-attendance.cmuvpdsz0ff6.eu-north-1.rds.amazonaws.com',
+    host: 'attenadnce-nano.cpka19y9rvyn.ap-south-1.rds.amazonaws.com',
     port: 3306,
     user: 'admin',
     password: 'fawad321',
