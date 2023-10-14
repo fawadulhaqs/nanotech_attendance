@@ -21,7 +21,7 @@ const db = mysql.createConnection({
 db.connect(err => {
     if (err) {
         throw err
-    }else{
+    } else {
         console.log('MySql is connected')
     }
 })
@@ -72,8 +72,8 @@ app.get('/api/getUserInfo', validateToken, (req, res) => {
     db.query(sql, (err, results) => {
         console.log(sql)
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
-        }else{
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
+        } else {
             const userData = results[0]
             if (userData) {
                 res.json({ ok: true, userInfo: userData })
@@ -95,7 +95,7 @@ app.get('/api/getUsers', validateToken, (req, res) => {
     let sql = "SELECT * FROM users WHERE role_id != 1"
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true, users: results })
     })
@@ -108,7 +108,7 @@ app.post('/api/addUser', validateToken, (req, res) => {
 
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true })
     })
@@ -119,20 +119,20 @@ app.get('/api/deleteUsers', validateToken, (req, res) => {
     let sql = `DELETE FROM users WHERE id = ${req.query.id};`
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true, users: results })
     })
 })
 
 app.post('/api/addProject', validateToken, (req, res) => {
-    const { name, city, area} = req.body;
+    const { name, city, area } = req.body;
 
     let sql = `INSERT INTO projects (name, city, area) VALUES ('${name}', '${city}', '${area}')`
 
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true })
     })
@@ -145,7 +145,7 @@ app.get('/api/daleteProject', validateToken, (req, res) => {
 
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true })
     })
@@ -156,7 +156,7 @@ app.get('/api/getProjects', validateToken, (req, res) => {
     let sql = "SELECT * FROM projects"
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true, projects: results })
     })
@@ -168,8 +168,10 @@ app.post('/api/login', (req, res) => {
     db.query(sql, (err, results) => {
         console.log(sql)
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
-        }else{
+            console.log(err)
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
+            return;
+        } else {
             const user = results[0]
             if (user) {
                 var expireTimeInMS = 3600 * 1000;
@@ -185,19 +187,38 @@ app.post('/api/login', (req, res) => {
                 res.json({ ok: true, token: token });
             } else {
                 res.status(401).json({ error: 'Invalid credentials' });
+                return;
             }
         }
     })
 });
 
 app.post('/api/cvc', validateToken, (req, res) => {
-    let sql = `UPDATE users SET password = '${req.body.password}' WHERE password = '${req.body.oldPassword}' AND id = ${req.body.id}`
+    let sql = `SELECT * FROM users WHERE password = '${req.body.oldPassword}' AND id = ${req.body.id}`
     db.query(sql, (err, results) => {
         console.log(sql)
         if (err) {
-            res.status(401).json({error:'request Developer to restart the Node APP'});
+            console.log(err)
+            res.status(401).json({ error: 'request Developer to restart the Node APP' });
+            return;
+        } else {
+            let user = results[0]
+            if (user) {
+                sql = `UPDATE users set password = ${req.body.password} WHERE id = ${user.id}`
+                db.query(sql, (err, results) => {
+                    if (err) {
+                        console.log(err)
+                        res.status(401).json({ error: 'Report Develper about error code CVC' });
+                        return;
+                    }else{
+                        res.json({ ok: true })
+                    }
+                })
+            } else {
+                res.status(404).json({ error: 'Your old password is not correct' });
+                return;
+            }
         }
-        res.json({ ok: true })
     })
 });
 
@@ -208,7 +229,7 @@ app.post('/api/addWorkHours', validateToken, (req, res) => {
 
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true })
     })
@@ -219,7 +240,7 @@ app.get('/api/delete', validateToken, (req, res) => {
     let sql = `DELETE FROM working_hours WHERE id = ${req.query.id};`
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true })
     })
@@ -233,7 +254,7 @@ app.post('/api/updateWorkHours', validateToken, (req, res) => {
 
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true })
     })
@@ -260,7 +281,7 @@ app.get('/api/getWorkingHours', validateToken, (req, res) => {
     }
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         } else {
             res.json({ ok: true, userHours: results })
         }
@@ -302,7 +323,7 @@ app.get('/api/getSubmission', validateToken, (req, res) => {
     }
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         res.json({ ok: true, reports: results })
     })
@@ -315,18 +336,18 @@ app.get('/api/approve', validateToken, (req, res) => {
     }
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         }
         sql = `SELECT * FROM working_hours WHERE submission_id = ${req.query.submissionId} AND userId = ${req.query.userId} AND status = 'Submitted'`
         db.query(sql, (err, results) => {
             if (err) {
-                res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+                res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
             }
             if (results.length < 1) {
                 sql = `UPDATE work_submission SET status = 'Approved', review_coments = '${req.query.reviews}' WHERE id = ${req.query.submissionId}`
                 db.query(sql, (err, results) => {
                     if (err) {
-                        res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+                        res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
                     }
                     res.json({ ok: true })
                 })
@@ -343,12 +364,12 @@ app.get('/api/reject', validateToken, (req, res) => {
         sql = `UPDATE working_hours SET status = '', submission_id = null WHERE submission_id = ${req.query.submissionId}`
         db.query(sql, (err, results) => {
             if (err) {
-                res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+                res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
             } else {
                 sql = `DELETE FROM work_submission WHERE id = ${req.query.submissionId};`
                 db.query(sql, (err, results) => {
                     if (err) {
-                        res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+                        res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
                     } else {
                         res.json({ ok: true })
                     }
@@ -365,13 +386,13 @@ app.get('/api/submit', validateToken, (req, res) => {
     let sql = `INSERT INTO work_submission (userId, status, userName) VALUES (${req.query.userId}, 'Submitted', '${req.query.userName}')`
     db.query(sql, (err, results) => {
         if (err) {
-            res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+            res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
         } else {
             if (results.insertId) {
                 sql = `UPDATE working_hours SET submission_id = ${results.insertId}, status = 'Submitted' WHERE id IN (${req.query.work_ids});`
                 db.query(sql, (err, results) => {
                     if (err) {
-                        res.status(401).json({error:'Error in Sql Querry or internal Error request Developer to restart the Node APP'});
+                        res.status(401).json({ error: 'Error in Sql Querry or internal Error request Developer to restart the Node APP' });
                     } else {
                         res.json({ ok: true })
                     }
