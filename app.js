@@ -404,15 +404,15 @@ app.get('/api/submit', validateToken, (req, res) => {
 
 })
 
-app.get('/api/1/customhit', validateToken, (req, res) => {
+app.get('/api/1/customhit', (req, res) => {
     res.json({ ok: true, result: 'Or Talal Bro Kia haal chal hyn ???' })
 })
 
-app.get('/api/2/customhit', validateToken, (req, res) => {
+app.get('/api/2/customhit', (req, res) => {
     res.json({ ok: true, result: 'Bhabi Sy Baat hoti ha phir ??? ' })
 })
 
-app.get('/api/3/customhit', validateToken, (req, res) => {
+app.get('/api/3/customhit', (req, res) => {
     res.json({ ok: true, result: 'Gand Marao !!!!!!!' })
 })
 
